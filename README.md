@@ -1,6 +1,9 @@
 # P5S Font Editor
 Edit font .g1n files from Persona 5 Strikers and maybe other Koei Tecmo games
 
+## Prerequisites
+Download and install [.NET 8.0 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-8.0.0-preview.5-windows-x64-installer)
+
 ## Open G1N
 Select a G1N font file to open and parse. Once a file was successfully parsed, you can utilize all the other features.
 
