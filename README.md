@@ -1,5 +1,5 @@
 # P5S Font Editor
-Edit font .g1n files from Persona 5 Strikers and maybe other Koei Tecmo games
+Edit font .g1n files from Persona 5 Strikers and maybe other Koei Tecmo games. Check out this [guide](https://gamebanana.com/tuts/16336) if you want to know the full process of modding in your own font.
 
 ## Prerequisites
 Download and install [.NET 8.0 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-8.0.0-preview.5-windows-x64-installer)
