@@ -29,6 +29,7 @@ namespace P5SFontEditor
         public int textureLength;
         public string fileName;
         public bool ExternalColorChange = false;
+        public int currentGlyphIndex = -1;
         public MainWindow()
         {
             InitializeComponent();
@@ -142,6 +143,7 @@ namespace P5SFontEditor
             }
             // Reset
             ImageViewer.Source = null;
+            MainGlyphTextbox.Clear();
             TextureWidthBox.Clear();
             TextureHeightBox.Clear();
             LeftSpaceBox.Clear();
@@ -154,14 +156,12 @@ namespace P5SFontEditor
             BlueTextbox.Clear();
             UTFTextbox.Clear();
             GlyphTextbox.Clear();
+            currentGlyphIndex = -1;
             ExternalColorChange = true;
             ColorPreview.SelectedColor = System.Windows.Media.Colors.Black;
             ColorNoAlphaPreview.Background = new SolidColorBrush(System.Windows.Media.Colors.Black);
             ExternalColorChange = false;
             // Populate dropdowns
-            GlyphSelector.ItemsSource = null;
-            GlyphSelector.ItemsSource = Glyphs;
-            GlyphSelector.DisplayMemberPath = "Index";
             ColorSelector.ItemsSource = Colors;
             ColorSelector.DisplayMemberPath = "Index";
             MessageBox.Show("Finished parsing G1N!");
@@ -190,18 +190,9 @@ namespace P5SFontEditor
             }
         }
 
-        private void GlyphSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (IsLoaded && GlyphSelector.ItemsSource != null)
-            {
-                var glyph = (sender as ComboBox).SelectedItem as Glyph;
-                DisplayImage16(glyph);
-            }
-        }
-
         private void SaveGlyphButton_Click(object sender, RoutedEventArgs e)
         {
-            if (GlyphSelector.SelectedIndex < 0)
+            if (currentGlyphIndex < 0)
                 return;
             try
             {
@@ -210,12 +201,12 @@ namespace P5SFontEditor
                 var leftSpace = Convert.ToByte(LeftSpaceBox.Text.Trim());
                 var baseLine = Convert.ToByte(BaseLineBox.Text.Trim());
                 var glyphWidth = Convert.ToByte(GlyphWidthBox.Text.Trim());
-                Glyphs[GlyphSelector.SelectedIndex].TextureWidth = Convert.ToByte(Convert.ToInt32(textureWidth) * 2);
-                Glyphs[GlyphSelector.SelectedIndex].TextureHeight = textureHeight;
-                Glyphs[GlyphSelector.SelectedIndex].LeftSpace = leftSpace;
-                Glyphs[GlyphSelector.SelectedIndex].BaseLine = baseLine;
-                Glyphs[GlyphSelector.SelectedIndex].GlyphWidth = glyphWidth;
-                DisplayImage16(Glyphs[GlyphSelector.SelectedIndex]);
+                Glyphs[currentGlyphIndex].TextureWidth = Convert.ToByte(Convert.ToInt32(textureWidth) * 2);
+                Glyphs[currentGlyphIndex].TextureHeight = textureHeight;
+                Glyphs[currentGlyphIndex].LeftSpace = leftSpace;
+                Glyphs[currentGlyphIndex].BaseLine = baseLine;
+                Glyphs[currentGlyphIndex].GlyphWidth = glyphWidth;
+                DisplayImage16(Glyphs[currentGlyphIndex]);
             }
             catch(Exception ex)
             {
@@ -225,7 +216,7 @@ namespace P5SFontEditor
 
         private void ExportAllButton_Click(object sender, RoutedEventArgs e)
         {
-            if (GlyphSelector.SelectedIndex < 0)
+            if (currentGlyphIndex < 0)
                 return;
 
             SaveFileDialog dlg = new();
@@ -282,7 +273,7 @@ namespace P5SFontEditor
 
         private void ImportTextureButton_Click(object sender, RoutedEventArgs e)
         {
-            if (GlyphSelector.SelectedIndex < 0)
+            if (currentGlyphIndex < 0)
                 return;
             OpenFileDialog dlg = new();
             dlg.Filter = "RAW file (*.raw)|*.raw";
@@ -296,17 +287,17 @@ namespace P5SFontEditor
             if (result == true)
             {
                 var importedFileBytes = File.ReadAllBytes(dlg.FileName);
-                if (importedFileBytes.Length == Glyphs[GlyphSelector.SelectedIndex].TextureData.Length)
+                if (importedFileBytes.Length == Glyphs[currentGlyphIndex].TextureData.Length)
                 {
-                    Glyphs[GlyphSelector.SelectedIndex].TextureData = importedFileBytes;
-                    DisplayImage16(Glyphs[GlyphSelector.SelectedIndex]);
+                    Glyphs[currentGlyphIndex].TextureData = importedFileBytes;
+                    DisplayImage16(Glyphs[currentGlyphIndex]);
                 }
-                else if (importedFileBytes.Length < Glyphs[GlyphSelector.SelectedIndex].TextureData.Length)
+                else if (importedFileBytes.Length < Glyphs[currentGlyphIndex].TextureData.Length)
                 {
-                    var diff = Glyphs[GlyphSelector.SelectedIndex].TextureData.Length - importedFileBytes.Length;
+                    var diff = Glyphs[currentGlyphIndex].TextureData.Length - importedFileBytes.Length;
                     var paddedImportedFileBytes = importedFileBytes.Concat(Enumerable.Repeat((byte)0x00, diff)).ToArray();
-                    Glyphs[GlyphSelector.SelectedIndex].TextureData = paddedImportedFileBytes;
-                    DisplayImage16(Glyphs[GlyphSelector.SelectedIndex]);
+                    Glyphs[currentGlyphIndex].TextureData = paddedImportedFileBytes;
+                    DisplayImage16(Glyphs[currentGlyphIndex]);
                 }
                 else
                     MessageBox.Show("Imported file is too large.");
@@ -315,12 +306,12 @@ namespace P5SFontEditor
 
         private void ExportTextureButton_Click(object sender, RoutedEventArgs e)
         {
-            if (GlyphSelector.SelectedIndex < 0)
+            if (currentGlyphIndex < 0)
                 return;
             SaveFileDialog dlg = new();
             dlg.Filter = "RAW file (*.raw)|*.raw";
             dlg.DefaultExt = ".raw";
-            dlg.FileName = $"{GlyphSelector.SelectedIndex}.raw";
+            dlg.FileName = $"{currentGlyphIndex}.raw";
             dlg.Title = "Export Texture";
             // Display OpenFileDialog by calling ShowDialog method 
             Nullable<bool> result = dlg.ShowDialog();
@@ -329,7 +320,7 @@ namespace P5SFontEditor
             // Get the selected file name and display in a TextBox 
             if (result == true)
             {
-                File.WriteAllBytes(dlg.FileName, Glyphs[GlyphSelector.SelectedIndex].TextureData);
+                File.WriteAllBytes(dlg.FileName, Glyphs[currentGlyphIndex].TextureData);
             }
         }
 
@@ -364,6 +355,29 @@ namespace P5SFontEditor
                 Colors[ColorSelector.SelectedIndex].Red = red;
                 Colors[ColorSelector.SelectedIndex].Green = green;
                 Colors[ColorSelector.SelectedIndex].Blue = blue;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void MainLoadGlyphIndexButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (Glyphs == null)
+                return;
+            try
+            {
+                var glyphIndex = Convert.ToInt32(MainGlyphTextbox.Text.Trim());
+                if (glyphIndex >= 0 && glyphIndex < Glyphs.Count)
+                {
+                    currentGlyphIndex = glyphIndex;
+                    DisplayImage16(Glyphs[currentGlyphIndex]);
+                }
+                else
+                {
+                    MessageBox.Show($"{glyphIndex} is out of bounds. Max index is {Glyphs.Count - 1}");
+                }
             }
             catch (Exception ex)
             {

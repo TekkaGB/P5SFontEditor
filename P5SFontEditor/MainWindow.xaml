@@ -6,7 +6,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:P5SFontEditor"
         mc:Ignorable="d" Background="#252525"
-        Title="P5S Font Editor" Height="475" Width="650">
+        Title="P5S Font Editor" Height="475" Width="700">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="0.15*"/>
@@ -69,14 +69,15 @@
                         </Grid.RowDefinitions>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
+                                <ColumnDefinition Width="2*"/>
                                 <ColumnDefinition/>
                                 <ColumnDefinition/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
-                            <StackPanel Orientation="Horizontal" Grid.Column="0" HorizontalAlignment="Center">
-                                <TextBlock Text="Glyph Index:" Foreground="White" VerticalAlignment="Center" Margin="5,5,0,5" />
-                                <ComboBox Name="GlyphSelector" Margin="5,15,15,15" Width="50" SelectionChanged="GlyphSelector_SelectionChanged"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,15,0,15">
+                                <TextBlock Text="Index:" Foreground="White" VerticalAlignment="Center" Margin="5,0,5,0" />
+                                <TextBox Name="MainGlyphTextbox" Margin="5,0,10,0" Width="100" Height="20"/>
+                                <Button x:Name="MainLoadGlyphButton" VerticalAlignment="Top"  Height="25" Width="100" Content="Load Glyph" Click="MainLoadGlyphIndexButton_Click"/>
                             </StackPanel>
                             <Button x:Name="ImportTextureButton" Grid.Column="1" Content="Import Texture" Margin="15" Height="25" Width="100" Click="ImportTextureButton_Click"/>
                             <Button x:Name="ExportTextureButton" Grid.Column="2" Content="Export Texture" Margin="15" Height="25" Width="100" Click="ExportTextureButton_Click"/>
